@@ -1,3 +1,6 @@
+[Home page](https://martinsantome.github.io/nosce-stonebreaker-the-root/scripts/the-root.html)
+![](./the-root.png)
+
 # nosce-stonebreaker-the-root
 nosce is a kind of spotlight. The stonebreaker deals with previous spotlight. The root is a chapter to light getting admin access on a system.
 # Demo

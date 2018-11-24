@@ -1,5 +1,5 @@
 [Home page](https://martinsantome.github.io/nosce-stonebreaker-the-root/scripts/the-root.html)
-![](./the-root.png)
+![](../the-root.png)
 
 On this folder we are pretty printing tutorials chapters.
 
