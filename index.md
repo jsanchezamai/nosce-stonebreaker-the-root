@@ -1,5 +1,2 @@
----
-layout: default
----
-
-[Do-the-upgrade-your-Linux-reverse-shell thing](./the-root.md).
+- [The Raw Thing](./raw-nosce-tutorial.html).
+- [Do-the-upgrade-your-Linux-reverse-shell thing](./scripts/the-root.md).
