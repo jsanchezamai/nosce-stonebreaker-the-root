@@ -9,7 +9,7 @@ Here’s how to upgrade your Linux reverse shell.
 python -c “import pty; pty.spawn(‘/bin/bash’)”
 ```
 
-You should get a nicer looking prompt, but your job isn’t over yet. Press Ctrl+Z to background your reverse shell, then in your local machine run:
+You should get a nicer looking prompt, but your job isn’t over yet. **Press Ctrl+Z** to background your reverse shell, then in your local machine run:
 
 ```console
 stty raw -echo
