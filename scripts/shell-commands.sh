@@ -20,4 +20,12 @@ echo "Upgrade Linux reverse shell"
 echo "How to background a process"
 # keyboard shortcut: Ctrl+Z
 
+echo "To be presented with a fully interactive shell"
+# stty raw -echo
+# fg
+# type reset and hit return
+
+echo "fix, the shell might not be the correct height/width for your terminal"
+# stty size
+
 
