@@ -1,6 +1,6 @@
 - [The Raw Thing](./raw-nosce-tutorial.html).
 - [Do-the-upgrade-your-Linux-reverse-shell thing](./scripts/the-root.md).
-- [Scraper, Nosce's full mountains](./PROYECTO_WEB_SCRAPER)
+- [Scraper, Nosce's full mountains](https://github.com/martinsantome/nosce-stonebreaker-the-root/tree/master/PROYECTO_WEB_SCRAPER)
 
 Simulations
 -----------
